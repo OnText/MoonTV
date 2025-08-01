@@ -1,0 +1,32 @@
+name: Sync with upstream repository
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天凌晨同步一次
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 拉取所有历史
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "OnText"
+          git config --global user.email "xonelin@gmail.com"
+
+      - name: Add upstream repository
+        run: git remote add upstream https://github.com/senshinya/MoonTV/.git || true
+
+      - name: Fetch upstream changes
+        run: git fetch upstream
+
+      - name: Merge upstream changes
+        run: |
+          git checkout main  # 切换到你的主分支
+          git merge upstream/main  # 合并原仓库的主分支
+          git push origin main  # 推送到你的仓库
